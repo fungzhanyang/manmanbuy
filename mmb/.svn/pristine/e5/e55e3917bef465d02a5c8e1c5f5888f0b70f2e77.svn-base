@@ -1,0 +1,74 @@
+$(function () {
+
+    var total = 0;
+    var page = 1;
+    var data = {};
+    var canSend = true;
+
+
+    firstGetProductList(page);
+    $('.page').on('change','select',function () {
+        if (!canSend) return;
+        page = this.value;
+        setPage(page);
+        getProductList(page);
+        canSend = false;
+    });
+    $('.page').on('click','.prev',function () {
+        if (!canSend) return;
+        page--;
+        console.log(page);
+        page<1?page=1:"";
+        getProductList(page);
+        setPage(page);
+        canSend = false;
+    });
+    $('.page').on('click','.next',function () {
+        if (!canSend) return;
+        page++;
+        page>total?page=total:"";
+        getProductList(page);
+        setPage(page);
+        canSend = false;
+    })
+
+
+
+    function firstGetProductList(page) {
+        $.get("http://139.199.157.195:9090/api/getproductlist", {
+            categoryid: getQueryString("categoryid"),
+            pageid: page
+        }, function (res) {
+            data = res;
+            var html = template("product_tpl", res);
+            $(".product").html(html);
+            $('.pp_title').append('&gt;<a href="#">'+getQueryString("category")+'</a>');
+            howManyPage();
+        })
+    }
+    function howManyPage() {
+        total = Math.ceil(data.totalCount / data.pagesize);
+        var pageData = {result:[]};
+        pageData.result.length = total;
+        var html = template("fanye", pageData);
+        $(".page").html(html);
+    }
+    function getProductList(page) {
+
+        $.get("http://139.199.157.195:9090/api/getproductlist", {
+            categoryid: getQueryString("categoryid"),
+            pageid: page
+        }, function (res) {
+            data = res;
+            var html = template("product_tpl", res);
+            $(".product").html(html);
+            window.scrollTo(0,0);
+            canSend = true;
+        })
+    }
+    function setPage(page) {
+        $('.page select').find('option').eq(page-1).attr('selected','selected').siblings().removeAttr('selected');
+    }
+})
+template.helper("getQueryString",getQueryString);
+

@@ -1,0 +1,37 @@
+
+//Created by puss on 2017/2/17.
+
+$(function(){
+
+    request();
+
+    function request(){
+        //console.log(window.location.search);
+        //���ú�����ȡ��url�е�����
+        var  productId = getNum(window.location.search);
+        console.log(productId);
+        $.ajax({
+            //����ȡ�������ִ��ݸ���̨ �����Ӧ������
+            url:"http://139.199.157.195:9090/api/getmoneyctrlproduct?productid="+productId,
+            success:function(info){
+                //console.log(info);
+                //����ģ�庯������ɶ�������ܵ���Ⱦ
+                tpl(info,"introduceTpl","introduce");
+                //����ģ�庯����ɶ����۲��ֵ���Ⱦ
+                tpl(info,"criticismTpl","criticism");
+                //����ģ�庯����ɶ��Ƿ��л����ֵ���Ⱦ
+                tpl(info,"somewhereTpl","somewhere");
+            }
+        })
+    }
+    //��ȡ����
+    function getNum(str) {
+        return str.replace(/[^0-9]+/g, '');
+    }
+    //ģ�庯��
+    function tpl(info,modelId,elementId){
+        var html = template(modelId,info);
+        //console.log(html);
+        $("#"+elementId).html(html);
+    }
+})
